@@ -33,7 +33,7 @@ public class HomePage extends WebPage {
             @Override
             protected void populateItem(ListItem<Comment> item) {
                 item.add(
-                        new Label("navn"),
+                        new Label("name"),
                         new MultiLineLabel("comment")
                 );
             }
@@ -41,14 +41,15 @@ public class HomePage extends WebPage {
     }
 
     private class Comment implements Serializable {
-        private String navn;
+        private String name;
+
         private String comment;
     }
 
     private class CommentForm extends Form<Comment> {
         public CommentForm(String id) {
             super(id, new CompoundPropertyModel<Comment>(new Comment()));
-            add(new TextField<String>("navn"));
+            add(new TextField<String>("name"));
             add(new TextArea<String>("comment"));
         }
 
