@@ -2,14 +2,10 @@ package no.bekk;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import java.io.Serializable;
@@ -19,7 +15,7 @@ import java.util.List;
 
 public class HomePage extends WebPage {
     private static final long serialVersionUID = 1L;
-    private final List<String> nameList = Collections.synchronizedList(new ArrayList<String>());
+    private final List<Comment> comments = Collections.synchronizedList(new ArrayList<Comment>());
 
 
     public HomePage(final PageParameters parameters) {
@@ -32,12 +28,12 @@ public class HomePage extends WebPage {
         add(new Label("numberOfNames", new AbstractReadOnlyModel<String>() {
             @Override
             public String getObject() {
-                return String.valueOf(nameList.size());
+                return String.valueOf(comments.size());
             }
         }));
     }
 
-    private class Commenter implements Serializable {
+    private class Comment implements Serializable {
 
         private String navn;
 
@@ -46,18 +42,17 @@ public class HomePage extends WebPage {
         }
     }
 
-    private class CommentForm extends Form<Commenter> {
+    private class CommentForm extends Form<Comment> {
         public CommentForm(String id) {
-            super(id, new CompoundPropertyModel<Commenter>(new Commenter()));
+            super(id, new CompoundPropertyModel<Comment>(new Comment()));
             add(new TextField<String>("navn"));
         }
 
         @Override
         protected void onSubmit() {
             super.onSubmit();
-            Commenter commenter = getModelObject();
-            nameList.add(commenter.getNavn());
-
+            Comment comment = getModelObject();
+            comments.add(comment);
         }
     }
 }
