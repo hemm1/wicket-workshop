@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:wicket="http://wicket.apache.org">
-	<head>
-		<meta charset="utf-8" />
-		<title>Eksempel på form i Wicket</title>
-		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="Stylesheet" />
-	</head>
-	<body>
-        <span wicket:id="hello">Dette blir borte, og her kommer Hello World!</span>
-	</body>
+<head>
+    <meta charset="utf-8"/>
+    <title>Eksempel på form i Wicket</title>
+    <link rel="stylesheet" href="style.css" type="text/css" media="screen" title="Stylesheet"/>
+</head>
+<body>
+<span wicket:id="hello">Dette blir borte, og her kommer Hello World!</span>
+<span wicket:id="numberOfNames">Antall navn i lista</span>
+
+<form wicket:id="commentForm">
+    <input type="text" wicket:id="navn" />
+    <input type="submit" />
+</form>
+</body>
 </html>
