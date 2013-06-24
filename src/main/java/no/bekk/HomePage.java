@@ -2,9 +2,12 @@ package no.bekk;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.PropertyListView;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
@@ -25,27 +28,28 @@ public class HomePage extends WebPage {
 
         add(new CommentForm("commentForm"));
 
-        add(new Label("numberOfNames", new AbstractReadOnlyModel<String>() {
+        add(new PropertyListView<Comment>("comments", comments) {
+
             @Override
-            public String getObject() {
-                return String.valueOf(comments.size());
+            protected void populateItem(ListItem<Comment> item) {
+                item.add(
+                        new Label("navn"),
+                        new MultiLineLabel("comment")
+                );
             }
-        }));
+        });
     }
 
     private class Comment implements Serializable {
-
         private String navn;
-
-        private String getNavn() {
-            return navn;
-        }
+        private String comment;
     }
 
     private class CommentForm extends Form<Comment> {
         public CommentForm(String id) {
             super(id, new CompoundPropertyModel<Comment>(new Comment()));
             add(new TextField<String>("navn"));
+            add(new TextArea<String>("comment"));
         }
 
         @Override
@@ -53,6 +57,7 @@ public class HomePage extends WebPage {
             super.onSubmit();
             Comment comment = getModelObject();
             comments.add(comment);
+            setModelObject(new Comment());
         }
     }
 }
