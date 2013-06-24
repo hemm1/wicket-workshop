@@ -7,9 +7,11 @@
 </head>
 <body>
 <h3 wicket:id="hello">Dette blir borte, og her kommer Hello World!</h3>
+<div wicket:id="feedback"></div>
 
 <form wicket:id="commentForm">
     Navn: <input type="text" wicket:id="name"/> <br />
+    E-post: <input type="text" wicket:id="email"/> <br />
     Kommentar: <textarea type="text" wicket:id="comment" /> <br />
     <input type="submit" value="kommenter!" />
 </form>
@@ -17,8 +19,9 @@
 Kommentarer: <br />
 
 <div wicket:id="comments" class="comment">
-    <span wicket:id="name"></span>
-    <span wicket:id="comment"></span>
+    <span wicket:id="name"></span> <br />
+    <span wicket:id="email"></span> <br />
+    <span wicket:id="comment"></span> <br />
 </div>
 
 </body>
