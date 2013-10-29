@@ -1,73 +1,81 @@
 package no.bekk;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.list.ListItem;
-import org.apache.wicket.markup.html.list.PropertyListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.validation.validator.EmailAddressValidator;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class HomePage extends WebPage {
     private static final long serialVersionUID = 1L;
-    private final List<Comment> comments = Collections.synchronizedList(new ArrayList<Comment>());
+    private final FeedbackPanel feedback;
 
+    private DBService dbService;
+    private final CommentPanel commentPanel;
 
     public HomePage(final PageParameters parameters) {
         super(parameters);
+        dbService = DBService.getInstance();
 
-        add(new FeedbackPanel("feedback"));
+        feedback = new FeedbackPanel("feedback");
+        feedback.setOutputMarkupId(true);
+        add(feedback);
+
+        add(new TimePanel("timePanel"));
 
         add(new Label("hello", "Hello World!"));
 
         add(new CommentForm("commentForm"));
 
-        add(new PropertyListView<Comment>("comments", comments) {
+        commentPanel = new CommentPanel("commentPanel");
+        commentPanel.setOutputMarkupId(true);
+        add(commentPanel);
 
+        add(new AjaxLink("toggleComments") {
             @Override
-            protected void populateItem(ListItem<Comment> item) {
-                item.add(
-                        new Label("name"),
-                        new Label("email"),
-                        new MultiLineLabel("comment")
-                );
+            public void onClick(AjaxRequestTarget target) {
+                dbService.toggleVisibility();
+//                commentPanel.setVisibilityAllowed(!commentPanel.isVisibilityAllowed());
+                target.add(commentPanel);
             }
         });
-    }
 
-    private class Comment implements Serializable {
-        private String name;
-
-        private String email;
-
-        private String comment;
     }
 
     private class CommentForm extends Form<Comment> {
         public CommentForm(String id) {
             super(id, new CompoundPropertyModel<Comment>(new Comment()));
-            add(new TextField<String>("name"));
-            add(new TextField<String>("email").add(EmailAddressValidator.getInstance()));
-            add(new TextArea<String>("comment"));
-        }
+            add(
+                    new TextField<String>("name").setRequired(true),
+                    new TextField<String>("email").add(EmailAddressValidator.getInstance()).setRequired(true),
+                    new TextArea<String>("commentText").setRequired(true),
+                    new AjaxSubmitLink("submit") {
+                        @Override
+                        protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                            super.onSubmit(target, form);
+                            Comment comment = getModelObject();
+                            dbService.addComment(comment);
+                            setModelObject(new Comment());
+                            info("comment saved successfully!");
+                            target.add(commentPanel);
+                            target.add(feedback);
+                        }
 
-        @Override
-        protected void onSubmit() {
-            super.onSubmit();
-            Comment comment = getModelObject();
-            comments.add(comment);
-            setModelObject(new Comment());
-            info("comment saved successfully!");
+                        @Override
+                        protected void onError(AjaxRequestTarget target, Form<?> form) {
+                            super.onError(target, form);
+                            target.add(feedback);
+                        }
+                    }
+            );
         }
     }
 }
